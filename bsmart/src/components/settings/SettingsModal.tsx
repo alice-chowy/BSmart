@@ -26,23 +26,21 @@ export function SettingsModal({
         className="relative flex w-[min(600px,100%)] max-h-[70vh] overflow-hidden rounded-[28px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
         onClick={(event) => event.stopPropagation()}
       >
-        <nav className="w-36 bg-[#f8f9fc] border-r border-[#eee] px-4 py-6">
+        <nav className="w-36 bg-[#D4E1F5] border-r border-[#999999] px-4 py-6">
           <button
             type="button"
-            className={`mb-2 block w-full rounded-xl px-3 py-3 text-left text-sm ${
+            className={`mb-2 block w-full rounded-xl px-3 py-3 text-left text-sm hover:bg-[#4D4D4D] hover:text-white ${
               tab === "general" ? "font-semibold text-[#222]" : "text-[#666]"
             }`}
-            onClick={() => setTab("general")}
-          >
+            onClick={() => setTab("general")}>
             一般
           </button>
           <button
             type="button"
-            className={`block w-full rounded-xl px-3 py-3 text-left text-sm ${
+            className={`block w-full rounded-xl px-3 py-3 text-left text-sm hover:bg-[#4D4D4D] hover:text-white ${
               tab === "models" ? "font-semibold text-[#222]" : "text-[#666]"
             }`}
-            onClick={() => setTab("models")}
-          >
+            onClick={() => setTab("models")}>
             模型管理
           </button>
         </nav>
@@ -102,7 +100,7 @@ export function SettingsModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1.5 text-xl text-[#999] hover:text-[#555]"
+          className="absolute right-4 top-4 rounded-full p-1.5 text-xl text-[#999] hover:text-[#4D4D4D]"
         >
           ✕
         </button>

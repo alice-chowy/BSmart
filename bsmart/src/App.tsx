@@ -34,10 +34,11 @@ export default function App() {
         activeChat={chat.activeChatId}
         onSelectChat={chat.selectChat}
         onNewChat={chat.newChat}
+        onOpenSettings={() => setSettingsOpen(true)}
         deviceName="SE880"
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className={`flex-1 flex flex-col overflow-hidden ${chat.activeChatId ? "bg-white" : "bg-[#F0F4F8]"}`}>
         <TopBar model={model} onSelect={setModel} onOpenSettings={() => setSettingsOpen(true)} />
         {chat.activeChatId ? (
           <ChatView

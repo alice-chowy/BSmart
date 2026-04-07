@@ -9,7 +9,7 @@ interface TopBarProps {
 
 export function TopBar({ model, onSelect, onOpenSettings }: TopBarProps) {
   return (
-    <div className="px-4 py-3 border-b border-[#ddd] bg-[#f5f6fa]">
+    <div className="px-4 py-3">
       <ModelSelector selected={model} onSelect={onSelect} onOpenSettings={onOpenSettings} />
     </div>
   )

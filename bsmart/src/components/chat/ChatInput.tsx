@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { ModeMenu } from "../mode/ModeMenu"
+import { IconPlaceholder } from "../common/IconPlaceholder"
 import { useClickOutside } from "../../hooks/useClickOutside"
 import type { Mode } from "../../types"
 
@@ -37,7 +38,7 @@ export function ChatInput({
 
   return (
     <div className="relative w-full max-w-[560px] mx-auto">
-      <div className={`flex items-center gap-2 rounded-[18px] border border-[#222] bg-white px-3 py-2 ${
+      <div className={`flex items-center gap-2 rounded-[18px] border border-[#999999] bg-white px-3 py-2 ${
         inputDisabled && !disabled ? "opacity-70" : "opacity-100"
       }`}>
         {showModeIcon && (
@@ -48,7 +49,7 @@ export function ChatInput({
               title="選擇功能模式"
               className="flex h-7 w-7 items-center justify-center rounded-md bg-[#2d2d6b] text-white"
             >
-              ⊞
+              <IconPlaceholder size={16} label="mode" />
             </button>
             {modeMenuOpen && (
               <ModeMenu selectedMode={selectedMode} onSelect={(mode) => {
@@ -68,17 +69,23 @@ export function ChatInput({
           className="flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
         />
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!text.trim() || inputDisabled}
-          title={!selectedMode && showModeIcon ? "請選擇模式" : "送出"}
-          className={`rounded-md px-3 py-2 text-lg text-[#333] transition-opacity ${
-            text.trim() && !inputDisabled ? "opacity-100" : "opacity-30"
-          }`}
-        >
-          ➤
-        </button>
+        <div className="relative group">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!text.trim() || inputDisabled}
+            className={`rounded-md px-3 py-2 text-lg text-[#333] transition-opacity ${
+              text.trim() && !inputDisabled ? "opacity-100" : "opacity-30"
+            }`}
+          >
+            ➤
+          </button>
+          {(!text.trim() || inputDisabled) && (
+            <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded-md bg-[#4D4D4D] px-2 py-1 text-xs text-white z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+              {!selectedMode && showModeIcon ? "請選擇模式" : "請輸入文字"}
+            </span>
+          )}
+        </div>
       </div>
 
       {showModeIcon && !selectedMode && (

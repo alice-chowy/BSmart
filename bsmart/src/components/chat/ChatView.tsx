@@ -27,7 +27,7 @@ export function ChatView({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="border-b border-[#eee] py-2">
+      <div className="py-2">
         <DeviceBridge compact />
       </div>
 

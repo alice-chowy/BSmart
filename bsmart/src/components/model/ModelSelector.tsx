@@ -20,7 +20,7 @@ export function ModelSelector({ selected, onSelect, onOpenSettings }: ModelSelec
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-2 rounded-2xl border border-transparent bg-white px-4 py-2 text-sm font-medium text-[#333] shadow-sm hover:border-[#ddd]"
+        className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-medium text-[#333] hover:bg-[#D9D9D9]"
       >
         <span className="text-xs">⌄</span>
         {selected.name}
