@@ -15,6 +15,7 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [model, setModel] = useState<Model>(MODELS[0]);
   const [customModels, setCustomModels] = useState<Model[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const chat = useChat(model.id);
 
   const handleAddCustomModel = (name: string) => {
@@ -22,14 +23,20 @@ export default function App() {
     setCustomModels((prev) => [...prev, newModel]);
   };
 
-  // 選模式 → 通知後端 POST /api/mode/select
+  // 選模式 → 通知後端 POST /api/mode/select，拿回 suggestions
   const handleSelectMode = (mode: Mode) => {
     chat.setSelectedMode(mode);
+    setSuggestions([]); // 先清空，等回傳
     fetch('/api/mode/select', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: mode.key }),
-    }).catch(() => {}); // 失敗靜默，不影響前端互動
+    })
+      .then((res) => res.json())
+      .then((data: { suggestions?: string[] }) => {
+        setSuggestions(data.suggestions ?? []);
+      })
+      .catch(() => {});
   };
 
   // 切換模型 → 通知後端 POST /api/models/select
@@ -83,12 +90,14 @@ export default function App() {
             isLoading={chat.isLoading}
             selectedMode={chat.selectedMode}
             onSelectMode={handleSelectMode}
+            suggestions={suggestions}
           />
         ) : (
           <HomeView
             onSend={chat.sendMessage}
             selectedMode={chat.selectedMode}
             onSelectMode={handleSelectMode}
+            suggestions={suggestions}
           />
         )}
       </div>

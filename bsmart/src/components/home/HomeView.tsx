@@ -7,9 +7,10 @@ interface HomeViewProps {
   onSend: (text: string) => void
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
+  suggestions?: string[]
 }
 
-export function HomeView({ onSend, selectedMode, onSelectMode }: HomeViewProps) {
+export function HomeView({ onSend, selectedMode, onSelectMode, suggestions = [] }: HomeViewProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8 py-10">
       <div className="w-full max-w-[560px]">
@@ -25,6 +26,7 @@ export function HomeView({ onSend, selectedMode, onSelectMode }: HomeViewProps) 
             showModeIcon
             selectedMode={selectedMode}
             onSelectMode={onSelectMode}
+            suggestions={suggestions}
           />
         </div>
       </div>

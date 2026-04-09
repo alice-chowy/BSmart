@@ -11,6 +11,7 @@ interface ChatInputProps {
   showModeIcon?: boolean
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
+  suggestions?: string[]
 }
 
 export function ChatInput({
@@ -20,6 +21,7 @@ export function ChatInput({
   showModeIcon = false,
   selectedMode,
   onSelectMode,
+  suggestions = [],
 }: ChatInputProps) {
   const [text, setText] = useState("")
   const [modeMenuOpen, setModeMenuOpen] = useState(false)
@@ -30,14 +32,31 @@ export function ChatInput({
   const inputDisabled = disabled || (showModeIcon && !selectedMode)
   const currentPlaceholder = selectedMode?.label ?? placeholder
 
-  const handleSubmit = () => {
-    if (!text.trim() || inputDisabled) return
-    onSend(text.trim())
+  const handleSubmit = (msg?: string) => {
+    const value = (msg ?? text).trim()
+    if (!value || inputDisabled) return
+    onSend(value)
     setText("")
   }
 
   return (
     <div className="relative w-full max-w-[560px] mx-auto">
+      {/* 建議清單 chips */}
+      {suggestions.length > 0 && selectedMode && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {suggestions.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => handleSubmit(s)}
+              className="rounded-full border border-[#999999] bg-white px-3 py-1 text-xs text-[#444] hover:bg-[#E9EEF6] transition-colors"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className={`flex items-center gap-2 rounded-[18px] border border-[#999999] bg-white px-3 py-2 ${
         inputDisabled && !disabled ? "opacity-70" : "opacity-100"
       }`}>
@@ -72,7 +91,7 @@ export function ChatInput({
         <div className="relative group">
           <button
             type="button"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={!text.trim() || inputDisabled}
             className={`rounded-md px-3 py-2 text-lg text-[#333] transition-opacity ${
               text.trim() && !inputDisabled ? "opacity-100" : "opacity-30"

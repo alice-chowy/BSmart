@@ -10,6 +10,7 @@ interface ChatViewProps {
   isLoading: boolean
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
+  suggestions?: string[]
 }
 
 export function ChatView({
@@ -18,6 +19,7 @@ export function ChatView({
   isLoading,
   selectedMode,
   onSelectMode,
+  suggestions = [],
 }: ChatViewProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
@@ -47,6 +49,7 @@ export function ChatView({
           showModeIcon
           selectedMode={selectedMode}
           onSelectMode={onSelectMode}
+          suggestions={suggestions}
         />
       </div>
     </div>
