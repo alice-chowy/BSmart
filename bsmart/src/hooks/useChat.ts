@@ -1,5 +1,20 @@
-import { useCallback, useRef, useState } from "react"
-import type { Chat, Mode } from "../types"
+import { useCallback, useEffect, useRef, useState } from "react"
+import type { Chat, Message, Mode } from "../types"
+
+// 後端 history session 格式
+interface ApiSession {
+  session_id: string
+  mode: string
+  message_count: number
+  preview: string
+  last_timestamp: string
+  model: string
+}
+
+interface ApiMessage {
+  role: "user" | "assistant"
+  content: string
+}
 
 export function useChat(modelId?: string) {
   const [chats, setChats] = useState<Chat[]>([])
@@ -8,7 +23,30 @@ export function useChat(modelId?: string) {
   const [selectedMode, setSelectedMode] = useState<Mode | null>(null)
   // session_id per chat: Map<chatId, session_id>
   const sessionMap = useRef<Map<string, string>>(new Map())
+  // 反向：session_id → chatId（用於歷史對話載入）
+  const sessionToChatId = useRef<Map<string, string>>(new Map())
   const wsRef = useRef<WebSocket | null>(null)
+
+  // ── 啟動時從後端載入歷史 sessions ──────────────────────────
+  useEffect(() => {
+    fetch("/api/history")
+      .then((res) => res.json())
+      .then((data: { sessions: ApiSession[] }) => {
+        if (!data.sessions?.length) return
+        const historicChats: Chat[] = data.sessions.map((s) => {
+          const chatId = `hist_${s.session_id}`
+          sessionMap.current.set(chatId, s.session_id)
+          sessionToChatId.current.set(s.session_id, chatId)
+          return {
+            id: chatId,
+            title: s.preview?.slice(0, 16) || s.session_id,
+            messages: [], // 先空著，點選時才載入
+          }
+        })
+        setChats(historicChats)
+      })
+      .catch(() => {}) // 後端沒開時靜默失敗
+  }, [])
 
   const sendMessage = useCallback(
     (text: string) => {
@@ -162,6 +200,29 @@ export function useChat(modelId?: string) {
 
   const selectChat = (id: string) => {
     setActiveChatId(id)
+
+    // 若是歷史對話且訊息還是空的，從後端載入
+    setChats((prev) => {
+      const chat = prev.find((c) => c.id === id)
+      if (!chat || chat.messages.length > 0) return prev
+      const sessionId = sessionMap.current.get(id)
+      if (!sessionId) return prev
+
+      fetch(`/api/history/${sessionId}`)
+        .then((res) => res.json())
+        .then((data: { messages: ApiMessage[] }) => {
+          const messages: Message[] = data.messages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          }))
+          setChats((p) =>
+            p.map((c) => (c.id === id ? { ...c, messages } : c)),
+          )
+        })
+        .catch(() => {})
+
+      return prev
+    })
   }
 
   const renameChat = (id: string, title: string) => {

@@ -42,8 +42,21 @@ export default function App() {
     }).catch(() => {});
   };
 
+  // SplashScreen 完成後 → 確認後端 agent ready，再進主畫面
+  const handleSplashFinish = () => {
+    fetch('/api/status')
+      .then((res) => res.json())
+      .then(() => {
+        setScreen('main');
+      })
+      .catch(() => {
+        // 後端沒開也能正常進入（Mock 模式）
+        setScreen('main');
+      });
+  };
+
   if (screen === 'splash') {
-    return <SplashScreen onFinish={() => setScreen('main')} />;
+    return <SplashScreen onFinish={handleSplashFinish} />;
   }
 
   return (
@@ -56,6 +69,8 @@ export default function App() {
         onSelectChat={chat.selectChat}
         onNewChat={chat.newChat}
         onOpenSettings={() => setSettingsOpen(true)}
+        onRenameChat={chat.renameChat}
+        onDeleteChat={chat.deleteChat}
         deviceName="SE880"
       />
 
