@@ -1,29 +1,70 @@
-import { useState } from "react"
-import { MODELS } from "./constants/models"
-import { useChat } from "./hooks/useChat"
-import { SplashScreen } from "./components/splash/SplashScreen"
-import { Sidebar } from "./components/layout/Sidebar"
-import { TopBar } from "./components/layout/TopBar"
-import { ChatView } from "./components/chat/ChatView"
-import { HomeView } from "./components/home/HomeView"
-import { SettingsModal } from "./components/settings/SettingsModal"
-import type { Model } from "./types"
+﻿import { useState, useEffect, useRef } from 'react';
+import {
+  HardDrive,
+  Laptop,
+  Send,
+  Settings,
+  ChevronDown,
+  Search,
+  Database,
+  Zap,
+  Activity,
+  ArrowRightLeft,
+  RefreshCcw,
+  SearchCode,
+  Settings2,
+  User,
+} from 'lucide-react';
+import { SplashScreen } from './components/splash/SplashScreen';
 
 export default function App() {
-  const [screen, setScreen] = useState<"splash" | "main">("splash")
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [model, setModel] = useState<Model>(MODELS[0])
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [customModels, setCustomModels] = useState<Model[]>([])
-  const chat = useChat()
+  const [screen, setScreen] = useState<'splash' | 'main'>('splash');
+  const [mode, setMode] = useState('backup');
+  const [isChatActive, setIsChatActive] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{ role: string; content: string }>>([]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [binaryData, setBinaryData] = useState<Array<{
+    id: number; val: number; delay: number; top: number; speed: number;
+  }>>([]);
 
-  const handleAddCustomModel = (name: string) => {
-    setCustomModels((prev) => [...prev, { id: `custom-${Date.now()}`, name, desc: "自訂模型" }])
+  useEffect(() => {
+    const data = Array.from({ length: 14 }).map((_, i) => ({
+      id: i,
+      val: Math.round(Math.random()),
+      delay: i * 0.2,
+      top: Math.random() * 50 + 25,
+      speed: Math.random() * 0.7 + 1.2,
+    }));
+    setBinaryData(data);
+  }, [mode]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim()) return;
+    if (!isChatActive) setIsChatActive(true);
+    const newUserMsg = { role: 'user', content: inputValue };
+    const newAiMsg = {
+      role: 'ai',
+      content: `正在為您執行「${inputValue}」相關的操作... 磁碟狀態良好，同步進度正常。`,
+    };
+    setChatHistory((prev) => [...prev, newUserMsg, newAiMsg]);
+    setInputValue('');
+  };
+
+  if (screen === 'splash') {
+    return <SplashScreen onFinish={() => setScreen('main')} />;
   }
 
-  if (screen === "splash") {
-    return <SplashScreen onFinish={() => setScreen("main")} />
-  }
+  const accentColor = {
+    sync:   { dot: 'bg-purple-500', badge: 'text-purple-600 border-purple-100', zap: 'fill-purple-600' },
+    search: { dot: 'bg-sky-500',    badge: 'text-sky-600 border-sky-100',       zap: 'fill-sky-600'    },
+    manage: { dot: 'bg-emerald-500',badge: 'text-emerald-600 border-emerald-100',zap: 'fill-emerald-600'},
+    backup: { dot: 'bg-indigo-500', badge: 'text-indigo-600 border-indigo-100', zap: 'fill-indigo-600' },
+  }[mode] ?? { dot: 'bg-indigo-500', badge: 'text-indigo-600 border-indigo-100', zap: 'fill-indigo-600' };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#ebeef5] font-sans text-[#111]">
@@ -36,8 +77,6 @@ export default function App() {
         onNewChat={chat.newChat}
         onOpenSettings={() => setSettingsOpen(true)}
         deviceName="SE880"
-        onRenameChat={chat.renameChat}
-        onDeleteChat={chat.deleteChat}
       />
 
       <div className={`flex-1 flex flex-col overflow-hidden ${chat.activeChatId ? "bg-white" : "bg-[#F0F4F8]"}`}>
@@ -67,5 +106,5 @@ export default function App() {
         onAddCustom={handleAddCustomModel}
       />
     </div>
-  )
+  );
 }
