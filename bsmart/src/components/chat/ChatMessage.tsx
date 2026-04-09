@@ -10,7 +10,7 @@ export function ChatMessage({ role, content, loading = false }: ChatMessageProps
   const isUser = role === "user"
 
   return (
-    <div className={`flex gap-3 mb-4 ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`flex gap-3 mb-5 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && <LogoPlaceholder size={32} />}
       <div
         className={`rounded-[18px] px-4 py-3 text-sm leading-6 ${

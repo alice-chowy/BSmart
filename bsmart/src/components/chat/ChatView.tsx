@@ -28,7 +28,7 @@ export function ChatView({
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="py-2">
-        <DeviceBridge compact />
+        <DeviceBridge compact mode={selectedMode} />
       </div>
 
       <div className="flex-1 overflow-y-auto px-8 py-5">
