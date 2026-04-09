@@ -7,20 +7,57 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onFinish }: SplashScreenProps) {
   const [progress, setProgress] = useState(0)
+  const [message, setMessage] = useState("準備啟動中...")
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setProgress((value) => {
-        if (value >= 100) {
-          window.clearInterval(interval)
-          window.setTimeout(onFinish, 300)
-          return 100
-        }
-        return value + 2
-      })
-    }, 40)
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+    const url = `${protocol}//${window.location.host}/ws/boot`
+    let finished = false
+    let ws: WebSocket
+    let retryTimer: ReturnType<typeof window.setTimeout> | null = null
 
-    return () => window.clearInterval(interval)
+    function connect() {
+      ws = new WebSocket(url)
+
+      ws.onmessage = (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data as string) as {
+            value: number
+            message: string
+            done: boolean
+            error: string | null
+          }
+          const pct = Math.round(data.value * 100)
+          setProgress(pct)
+          if (data.message) setMessage(data.message)
+          if (data.done && !finished) {
+            finished = true
+            ws.close()
+            // 若後端已跑完才連上（pct 直接就是 100），給進度條 900ms 動畫跑完再離開
+            window.setTimeout(onFinish, pct >= 100 ? 1000 : 300)
+          }
+        } catch {
+          // ignore malformed frames
+        }
+      }
+
+      // 後端尚未啟動或連線中斷，1 秒後重試
+      ws.onerror = () => ws.close()
+      ws.onclose = () => {
+        if (!finished) {
+          setMessage("等待後端啟動...")
+          retryTimer = window.setTimeout(connect, 1000)
+        }
+      }
+    }
+
+    connect()
+
+    return () => {
+      finished = true
+      if (retryTimer !== null) window.clearTimeout(retryTimer)
+      ws.close()
+    }
   }, [onFinish])
 
   return (
@@ -34,9 +71,9 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         />
 
         <div className="flex flex-col items-center gap-4">
-          <div className="w-[288px] h-1 rounded-full bg-[#c0c4d4] overflow-hidden relative">
+          <div className={`w-[288px] h-1 rounded-full overflow-hidden relative${progress === 0 ? " animate-pulse" : ""}`}>
             <div
-              className="absolute top-0 h-full rounded-full transition-all duration-100"
+              className="absolute top-0 h-full rounded-full transition-[width,left] duration-[900ms] ease-out"
               style={{
                 left: `${(100 - progress) / 2}%`,
                 width: `${progress}%`,
@@ -56,7 +93,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
             className="text-[#6b6b9b]"
             style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: "12px" }}
           >
-            {progress < 20 ? "開啟中" : progress < 100 ? "載入中" : "LLM模型啟動中"}
+            {message}
           </div>
         </div>
       </div>

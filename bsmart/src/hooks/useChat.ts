@@ -74,6 +74,19 @@ export function useChat() {
     setActiveChatId(id)
   }
 
+  const renameChat = (id: string, title: string) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) => (chat.id === id ? { ...chat, title } : chat)),
+    )
+  }
+
+  const deleteChat = (id: string) => {
+    setChats((prevChats) => prevChats.filter((chat) => chat.id !== id))
+    if (activeChatId === id) {
+      setActiveChatId(null)
+    }
+  }
+
   return {
     chats,
     activeChatId,
@@ -83,6 +96,8 @@ export function useChat() {
     sendMessage,
     newChat,
     selectChat,
+    renameChat,
+    deleteChat,
     setSelectedMode,
   }
 }

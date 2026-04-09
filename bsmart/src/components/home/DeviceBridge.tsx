@@ -14,7 +14,7 @@ export function DeviceBridge({ compact = false }: DeviceBridgeProps) {
       <div className="text-center">
         <div className={`${labelClass} font-semibold text-[#333] mb-1.5`}>SSD</div>
         <div
-          className="bg-white rounded-[14px] border border-[#d0d0d0] flex items-center justify-center"
+          className="bg-white rounded-[14px] border border-[#999999] flex items-center justify-center"
           style={{ width: deviceWidth, height }}
         >
           <div className="w-7 h-7 rounded-md bg-[#e0e0e0]" />
@@ -34,7 +34,7 @@ export function DeviceBridge({ compact = false }: DeviceBridgeProps) {
       <div className="text-center">
         <div className={`${labelClass} font-semibold text-[#333] mb-1.5`}>電腦</div>
         <div
-          className="bg-white rounded-[14px] border border-[#d0d0d0] flex items-center justify-center"
+          className="bg-white rounded-[14px] border border-[#999999] flex items-center justify-center"
           style={{ width: deviceWidth, height }}
         >
           <div style={{ fontSize: iconSize, color: "#e8a820" }}>💡</div>

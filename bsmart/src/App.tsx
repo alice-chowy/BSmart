@@ -36,6 +36,8 @@ export default function App() {
         onNewChat={chat.newChat}
         onOpenSettings={() => setSettingsOpen(true)}
         deviceName="SE880"
+        onRenameChat={chat.renameChat}
+        onDeleteChat={chat.deleteChat}
       />
 
       <div className={`flex-1 flex flex-col overflow-hidden ${chat.activeChatId ? "bg-white" : "bg-[#F0F4F8]"}`}>

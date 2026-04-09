@@ -20,15 +20,15 @@ export function ModelSelector({ selected, onSelect, onOpenSettings }: ModelSelec
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-medium text-[#333] hover:bg-[#D9D9D9]"
+        className="inline-flex items-center gap-2 rounded-2xl bg-transparent px-4 py-2 text-sm font-medium text-[#333] hover:bg-[#D9D9D9] shadow-none"
       >
         <span className="text-xs">⌄</span>
         {selected.name}
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-2 min-w-[280px] rounded-2xl border border-[#ddd] bg-white text-sm shadow-[0_4px_16px_rgba(0,0,0,0.12)]">
-          {MODELS.map((model) => (
+      <div className="absolute top-full left-0 mt-2 w-[300px] overflow-hidden rounded-2xl border border-[#999999] bg-white text-sm shadow-[0_4px_16px_rgba(0,0,0,0.12)]"> 
+        {MODELS.map((model) => (
             <button
               key={model.id}
               type="button"
@@ -37,7 +37,7 @@ export function ModelSelector({ selected, onSelect, onOpenSettings }: ModelSelec
                 setOpen(false)
               }}
               className={`w-full px-4 py-3 text-left ${
-                model.id === selected.id ? "bg-[#f5f5f5]" : "hover:bg-[#fafbff]"
+                model.id === selected.id ? "bg-[#F5F5F5]" : "hover:bg-[#F5F5F5]"
               }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -53,7 +53,7 @@ export function ModelSelector({ selected, onSelect, onOpenSettings }: ModelSelec
               setOpen(false)
               onOpenSettings()
             }}
-            className="w-full px-4 py-3 text-left text-sm font-semibold text-[#333] border-t border-[#eee] hover:bg-[#fafbff]"
+            className="w-full px-4 py-3 text-left text-sm font-semibold text-[#333] border-t border-[#999999] hover:bg-[#F5F5F5]"
           >
             新增
           </button>

@@ -27,17 +27,12 @@ export function SettingsModal({
         onClick={(event) => event.stopPropagation()}
       >
         <nav className="w-36 bg-[#D4E1F5] border-r border-[#999999] px-4 py-6">
-          <button
-            type="button"
-            className={`mb-2 block w-full rounded-xl px-3 py-3 text-left text-sm hover:bg-[#4D4D4D] hover:text-white ${
-              tab === "general" ? "font-semibold text-[#222]" : "text-[#666]"
-            }`}
-            onClick={() => setTab("general")}>
+          <div className="mb-0.5 block w-full px-3 py-1.5 text-left text-xs font-semibold text-[#444] select-none">
             一般
-          </button>
+          </div>
           <button
             type="button"
-            className={`block w-full rounded-xl px-3 py-3 text-left text-sm hover:bg-[#4D4D4D] hover:text-white ${
+            className={`block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-[#F5F5F5] ${
               tab === "models" ? "font-semibold text-[#222]" : "text-[#666]"
             }`}
             onClick={() => setTab("models")}>
@@ -53,12 +48,13 @@ export function SettingsModal({
             </div>
           ) : (
             <div>
-              <h3 className="mb-5 text-lg font-semibold text-[#555]">模型管理</h3>
+              <h3 className="mb-3 text-lg font-semibold text-[#555]">模型管理</h3>
+              <div className="border-t border-[#999999] mb-4" />
               <div className="mb-5">
                 <div className="mb-2 text-sm font-semibold text-[#333]">預設模型</div>
                 <div className="space-y-3">
                   {models.map((model) => (
-                    <div key={model.id} className="rounded-2xl border border-[#f0f0f0] p-3">
+                    <div key={model.id} className="cursor-default rounded-2xl p-3 hover:bg-[#F5F5F5]">
                       <div className="font-semibold text-sm">{model.name}</div>
                       <div className="mt-1 text-[11px] text-[#888]">{model.desc}</div>
                     </div>
@@ -66,7 +62,7 @@ export function SettingsModal({
                 </div>
               </div>
 
-              <div className="border-t border-[#eee] pt-4">
+              <div className="border-t border-[#999999] pt-4">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#333]">
                   自訂模型
                   <button
@@ -85,7 +81,7 @@ export function SettingsModal({
                 ) : (
                   <div className="space-y-3">
                     {customModels.map((model, index) => (
-                      <div key={index} className="rounded-2xl border border-[#f0f0f0] p-3">
+                      <div key={index} className="rounded-2xl border border-[#999999] p-3">
                         <div className="font-semibold text-sm">{model.name}</div>
                         <div className="mt-1 text-[11px] text-[#888]">自訂模型</div>
                       </div>

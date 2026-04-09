@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram name="第 1 页" id="n2MP2Q0Y5HU3b5ey5dJk">
-        <mxGraphModel dx="1564" dy="771" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1801" dy="1036" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -2974,7 +2974,7 @@
                 <mxCell id="w2jhh35Ojw4fDeovjTX9-48" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#CCFFFF;aspect=fixed;fillColor=none;strokeWidth=5;" parent="1" vertex="1">
                     <mxGeometry x="-585.3233333333342" y="1579.44" width="116.71" height="106.11" as="geometry"/>
                 </mxCell>
-                <mxCell id="w2jhh35Ojw4fDeovjTX9-50" value="【還原】" style="text;whiteSpace=wrap;html=1;fontSize=17;align=center;" parent="1" vertex="1">
+                <mxCell id="w2jhh35Ojw4fDeovjTX9-50" value="【同步】" style="text;whiteSpace=wrap;html=1;fontSize=17;align=center;" parent="1" vertex="1">
                     <mxGeometry x="-940.9700000000003" y="1615.5533333333335" width="76" height="36" as="geometry"/>
                 </mxCell>
                 <mxCell id="w2jhh35Ojw4fDeovjTX9-51" value="" style="shape=xor;whiteSpace=wrap;html=1;rotation=90;" parent="1" vertex="1">
