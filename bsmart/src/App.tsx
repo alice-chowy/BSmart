@@ -7,7 +7,7 @@ import { HomeView } from './components/home/HomeView';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { useChat } from './hooks/useChat';
 import { MODELS } from './constants/models';
-import type { Model } from './types';
+import type { Model, Mode } from './types';
 
 export default function App() {
   const [screen, setScreen] = useState<'splash' | 'main'>('splash');
@@ -15,11 +15,31 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [model, setModel] = useState<Model>(MODELS[0]);
   const [customModels, setCustomModels] = useState<Model[]>([]);
-  const chat = useChat();
+  const chat = useChat(model.id);
 
   const handleAddCustomModel = (name: string) => {
     const newModel: Model = { id: name, name, desc: '自訂模型' };
     setCustomModels((prev) => [...prev, newModel]);
+  };
+
+  // 選模式 → 通知後端 POST /api/mode/select
+  const handleSelectMode = (mode: Mode) => {
+    chat.setSelectedMode(mode);
+    fetch('/api/mode/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: mode.key }),
+    }).catch(() => {}); // 失敗靜默，不影響前端互動
+  };
+
+  // 切換模型 → 通知後端 POST /api/models/select
+  const handleSelectModel = (m: Model) => {
+    setModel(m);
+    fetch('/api/models/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model_id: m.id }),
+    }).catch(() => {});
   };
 
   if (screen === 'splash') {
@@ -40,20 +60,20 @@ export default function App() {
       />
 
       <div className={`flex-1 flex flex-col overflow-hidden ${chat.activeChatId ? 'bg-white' : 'bg-[#F0F4F8]'}`}>
-        <TopBar model={model} onSelect={setModel} onOpenSettings={() => setSettingsOpen(true)} />
+        <TopBar model={model} onSelect={handleSelectModel} onOpenSettings={() => setSettingsOpen(true)} />
         {chat.activeChatId ? (
           <ChatView
             messages={chat.activeChat?.messages ?? []}
             onSend={chat.sendMessage}
             isLoading={chat.isLoading}
             selectedMode={chat.selectedMode}
-            onSelectMode={chat.setSelectedMode}
+            onSelectMode={handleSelectMode}
           />
         ) : (
           <HomeView
             onSend={chat.sendMessage}
             selectedMode={chat.selectedMode}
-            onSelectMode={chat.setSelectedMode}
+            onSelectMode={handleSelectMode}
           />
         )}
       </div>
