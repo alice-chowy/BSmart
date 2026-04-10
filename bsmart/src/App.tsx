@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useState } from 'react';
 import { SplashScreen } from './components/splash/SplashScreen';
 import { Sidebar } from './components/layout/Sidebar';
 import { TopBar } from './components/layout/TopBar';
@@ -16,24 +16,7 @@ export default function App() {
   const [model, setModel] = useState<Model>(MODELS[0]);
   const [customModels, setCustomModels] = useState<Model[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'running' | 'disconnected'>('disconnected');
   const chat = useChat(model.id);
-
-  // 定期 poll /api/status 更新連線指示燈（每 10 秒）
-  useEffect(() => {
-    const check = () => {
-      fetch('/api/status')
-        .then((res) => res.json())
-        .then((data: { agent?: string; llama?: string }) => {
-          if (data.agent === 'ready') setConnectionStatus('connected');
-          else setConnectionStatus('running');
-        })
-        .catch(() => setConnectionStatus('disconnected'));
-    };
-    check();
-    const timer = setInterval(check, 10000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleAddCustomModel = (name: string) => {
     const newModel: Model = { id: name, name, desc: '自訂模型' };
@@ -95,8 +78,6 @@ export default function App() {
         onOpenSettings={() => setSettingsOpen(true)}
         onRenameChat={chat.renameChat}
         onDeleteChat={chat.deleteChat}
-        onClearAll={chat.clearAllChats}
-        connectionStatus={connectionStatus}
         deviceName="SE880"
       />
 
@@ -127,9 +108,8 @@ export default function App() {
         models={MODELS}
         customModels={customModels}
         onAddCustom={handleAddCustomModel}
-        onShutdown={() => {
-          fetch('/api/shutdown', { method: 'POST' }).catch(() => {});
-        }}
+        onClearAllChats={chat.clearAllChats}
+        onShutdown={chat.shutdown}
       />
     </div>
   );

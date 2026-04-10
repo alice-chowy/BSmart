@@ -7,6 +7,7 @@ interface SettingsModalProps {
   models: Model[]
   customModels: Model[]
   onAddCustom: (name: string) => void
+  onClearAllChats?: () => void
   onShutdown?: () => void
 }
 
@@ -16,6 +17,7 @@ export function SettingsModal({
   models,
   customModels,
   onAddCustom,
+  onClearAllChats,
   onShutdown,
 }: SettingsModalProps) {
   const [tab, setTab] = useState<"general" | "models">("models")
@@ -35,6 +37,14 @@ export function SettingsModal({
           <button
             type="button"
             className={`block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-[#F5F5F5] ${
+              tab === "general" ? "font-semibold text-[#222]" : "text-[#666]"
+            }`}
+            onClick={() => setTab("general")}>
+            一般設定
+          </button>
+          <button
+            type="button"
+            className={`block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-[#F5F5F5] ${
               tab === "models" ? "font-semibold text-[#222]" : "text-[#666]"
             }`}
             onClick={() => setTab("models")}>
@@ -46,24 +56,45 @@ export function SettingsModal({
           {tab === "general" ? (
             <div>
               <h3 className="mb-4 text-lg font-semibold text-[#333]">一般設定</h3>
-              <p className="text-sm text-[#888] mb-6">（一般設定內容佔位）</p>
-              {onShutdown && (
-                <div className="border-t border-[#e0e0e0] pt-5">
-                  <div className="mb-2 text-sm font-semibold text-[#333]">系統</div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("確定要關閉 AI SSD？")) {
-                        onShutdown()
-                        onClose()
-                      }
-                    }}
-                    className="rounded-xl border border-[#E53E3E] px-4 py-2 text-sm font-semibold text-[#E53E3E] hover:bg-[#FFF0F0] transition-colors"
-                  >
-                    關閉 AI SSD
-                  </button>
-                </div>
-              )}
+              <div className="border-t border-[#999999] mb-4" />
+
+              {/* 清除全部對話 */}
+              <div className="mb-5">
+                <div className="mb-1 text-sm font-semibold text-[#333]">對話紀錄</div>
+                <p className="mb-3 text-xs text-[#888]">清除所有歷史對話紀錄，此操作無法復原。</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm("確定要清除所有對話紀錄嗎？")) {
+                      onClearAllChats?.()
+                      onClose()
+                    }
+                  }}
+                  className="rounded-xl border border-[#E53E3E] px-4 py-2 text-sm text-[#E53E3E] hover:bg-[#FFF0F0] transition-colors"
+                >
+                  清除全部對話
+                </button>
+              </div>
+
+              <div className="border-t border-[#999999] my-4" />
+
+              {/* 關機 */}
+              <div>
+                <div className="mb-1 text-sm font-semibold text-[#333]">系統</div>
+                <p className="mb-3 text-xs text-[#888]">傳送關機指令給 AI SSD 後端。</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm("確定要關閉 AI SSD 嗎？")) {
+                      onShutdown?.()
+                      onClose()
+                    }
+                  }}
+                  className="rounded-xl border border-[#999999] px-4 py-2 text-sm text-[#555] hover:bg-[#F5F5F5] transition-colors"
+                >
+                  關閉 AI SSD
+                </button>
+              </div>
             </div>
           ) : (
             <div>

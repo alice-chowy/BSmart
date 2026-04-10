@@ -16,6 +16,14 @@ interface ApiMessage {
   content: string
 }
 
+// 模式 key → 中文名稱
+const MODE_LABEL: Record<string, string> = {
+  scan: "掃描",
+  search: "搜尋",
+  manage: "管理",
+  sync: "同步",
+}
+
 export function useChat(modelId?: string) {
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
@@ -39,7 +47,7 @@ export function useChat(modelId?: string) {
           sessionToChatId.current.set(s.session_id, chatId)
           return {
             id: chatId,
-            title: s.preview?.slice(0, 16) || s.session_id,
+            title: s.preview?.trim() || `${MODE_LABEL[s.mode] ?? s.mode} 對話`,
             messages: [], // 先空著，點選時才載入
           }
         })
@@ -240,13 +248,18 @@ export function useChat(modelId?: string) {
     if (activeChatId === id) setActiveChatId(null)
   }
 
+  // DELETE /api/history — 清除全部對話紀錄
   const clearAllChats = () => {
     fetch("/api/history", { method: "DELETE" }).catch(() => {})
     sessionMap.current.clear()
     sessionToChatId.current.clear()
     setChats([])
     setActiveChatId(null)
-    setSelectedMode(null)
+  }
+
+  // POST /api/shutdown — 模擬關機
+  const shutdown = () => {
+    fetch("/api/shutdown", { method: "POST" }).catch(() => {})
   }
 
   return {
@@ -261,6 +274,7 @@ export function useChat(modelId?: string) {
     renameChat,
     deleteChat,
     clearAllChats,
+    shutdown,
     setSelectedMode,
   }
 }
