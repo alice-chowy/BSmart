@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
+import { PanelLeftClose, PanelLeftOpen, SquarePen, HardDrive, Wifi } from "lucide-react"
 import type { Chat } from "../../types"
-import { IconPlaceholder } from "../common/IconPlaceholder"
 import { useClickOutside } from "../../hooks/useClickOutside"
 
 function EditIcon() {
@@ -142,28 +142,35 @@ export function Sidebar({
 
   return (
     <aside
-      className={`flex flex-col bg-[#D4E1F5] border-r border-[#999999] transition-all duration-200 ${
+      className={`flex flex-col bg-[#D4E1F5] border-r border-[#999999] transition-all duration-200 overflow-visible ${
         expanded ? "w-[200px] p-2.5" : "w-[48px] py-2.5"
       }`}
     >
       <div className="flex flex-col gap-2">
         {/* 1. Toggle */}
         <div className={iconRow}>
-          <button type="button" onClick={onToggle} aria-label={expanded ? "收回左欄" : "展開左欄"} className="p-1.5">
-            <IconPlaceholder size={20} label="menu" />
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={expanded ? "收回左欄" : "展開左欄"}
+            className="p-1.5 text-[#444] hover:text-[#111]"
+          >
+            {expanded ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
           </button>
-          <SidebarTooltip text={expanded ? "收回左欄" : "展開左欄"} />
         </div>
 
         {/* 2. New chat */}
         <div className={iconRow}>
-          <button type="button" onClick={onNewChat} aria-label="新對話" className="p-1.5">
-            <IconPlaceholder size={20} label="new-chat" />
+          <button
+            type="button"
+            onClick={onNewChat}
+            aria-label="新對話"
+            className="flex items-center gap-2 p-1.5 text-[#444] hover:text-[#111]"
+          >
+            <SquarePen size={20} />
+            {expanded && <span className="text-sm font-medium">新的對話</span>}
           </button>
-          {!expanded && <SidebarTooltip text="新對話" />}
         </div>
-
-
       </div>
 
       {expanded && (
@@ -191,13 +198,13 @@ export function Sidebar({
         )}
         <div className="pt-0">
         <div className={`relative group flex items-center ${expanded ? "gap-2 pl-1.5 cursor-pointer" : "justify-center cursor-pointer"}`} onClick={onOpenSettings} role="button" aria-label="設定">
-          <IconPlaceholder size={22} label="device" style={{ background: "#333", borderRadius: "999px" }} />
+          <HardDrive size={22} color="#333" />
           {expanded && <span className="text-[13px] font-semibold">{deviceName || "SE880"}</span>}
           <SidebarTooltip text="設定" />
         </div>
 
         <div className={`relative group mt-2 flex items-center ${expanded ? "gap-2 pl-1.5" : "justify-center"}`}>
-          <IconPlaceholder size={22} label="connection" style={{ background: conn.color, borderRadius: "999px" }} />
+          <Wifi size={22} color={conn.color} />
           {expanded ? (
             <>
               <span className="text-[12px]" style={{ color: conn.color }}>{conn.label}</span>
