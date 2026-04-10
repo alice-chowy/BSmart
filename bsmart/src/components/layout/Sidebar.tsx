@@ -114,7 +114,6 @@ interface SidebarProps {
   connectionStatus?: ConnectionStatus
   onRenameChat?: (id: string, title: string) => void
   onDeleteChat?: (id: string) => void
-  onClearAll?: () => void
 }
 
 function SidebarTooltip({ text }: { text: string }) {
@@ -137,7 +136,6 @@ export function Sidebar({
   connectionStatus = "connected",
   onRenameChat,
   onDeleteChat,
-  onClearAll,
 }: SidebarProps) {
   const conn = CONNECTION_CONFIG[connectionStatus]
   const iconRow = `relative group w-full flex ${expanded ? "" : "justify-center"}`
@@ -170,22 +168,6 @@ export function Sidebar({
 
       {expanded && (
         <div className="flex-1 mt-3 overflow-y-auto space-y-2">
-          {chats.length > 0 && (
-            <div className="flex items-center justify-between px-1 mb-1">
-              <span className="text-[11px] text-[#888] font-semibold tracking-wide">歷史對話</span>
-              {onClearAll && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm("確定清除全部對話紀錄？")) onClearAll()
-                  }}
-                  className="text-[10px] text-[#999] hover:text-[#E53E3E] transition-colors"
-                >
-                  全部清除
-                </button>
-              )}
-            </div>
-          )}
           {chats.map((chat) => (
             <ChatItem
               key={chat.id}
