@@ -7,6 +7,7 @@ interface SettingsModalProps {
   models: Model[]
   customModels: Model[]
   onAddCustom: (name: string) => void
+  onShutdown?: () => void
 }
 
 export function SettingsModal({
@@ -15,6 +16,7 @@ export function SettingsModal({
   models,
   customModels,
   onAddCustom,
+  onShutdown,
 }: SettingsModalProps) {
   const [tab, setTab] = useState<"general" | "models">("models")
 
@@ -44,7 +46,24 @@ export function SettingsModal({
           {tab === "general" ? (
             <div>
               <h3 className="mb-4 text-lg font-semibold text-[#333]">一般設定</h3>
-              <p className="text-sm text-[#888]">（一般設定內容佔位）</p>
+              <p className="text-sm text-[#888] mb-6">（一般設定內容佔位）</p>
+              {onShutdown && (
+                <div className="border-t border-[#e0e0e0] pt-5">
+                  <div className="mb-2 text-sm font-semibold text-[#333]">系統</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("確定要關閉 AI SSD？")) {
+                        onShutdown()
+                        onClose()
+                      }
+                    }}
+                    className="rounded-xl border border-[#E53E3E] px-4 py-2 text-sm font-semibold text-[#E53E3E] hover:bg-[#FFF0F0] transition-colors"
+                  >
+                    關閉 AI SSD
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div>

@@ -240,6 +240,15 @@ export function useChat(modelId?: string) {
     if (activeChatId === id) setActiveChatId(null)
   }
 
+  const clearAllChats = () => {
+    fetch("/api/history", { method: "DELETE" }).catch(() => {})
+    sessionMap.current.clear()
+    sessionToChatId.current.clear()
+    setChats([])
+    setActiveChatId(null)
+    setSelectedMode(null)
+  }
+
   return {
     chats,
     activeChatId,
@@ -251,6 +260,7 @@ export function useChat(modelId?: string) {
     selectChat,
     renameChat,
     deleteChat,
+    clearAllChats,
     setSelectedMode,
   }
 }
