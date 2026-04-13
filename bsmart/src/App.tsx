@@ -8,11 +8,24 @@ import { SettingsModal } from './components/settings/SettingsModal';
 import { useChat } from './hooks/useChat';
 import { MODELS } from './constants/models';
 import type { Model, Mode } from './types';
+import logoRmbg from '@logo/LOGO_rmbg.png';
 
 type ConnectionStatus = 'connected' | 'running' | 'disconnected';
 
+// 離開後的關閉畫面
+function DisconnectedScreen() {
+  return (
+    <div className="w-screen h-screen bg-[#D4E1F5] flex flex-col items-center justify-center gap-4">
+      <img src={logoRmbg} alt="BSMART" style={{ maxHeight: 180, maxWidth: 380 }} className="object-contain" />
+      <p className="text-[#4a4a7a] text-sm tracking-widest" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        BSMART 已關閉，可以安全關閉此視窗
+      </p>
+    </div>
+  );
+}
+
 export default function App() {
-  const [screen, setScreen] = useState<'splash' | 'main'>('splash');
+  const [screen, setScreen] = useState<'splash' | 'main' | 'disconnected'>('splash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [model, setModel] = useState<Model>(MODELS[0]);
@@ -45,6 +58,7 @@ export default function App() {
     if (connectionStatus !== 'connected') return;
     if (window.confirm('離開 BSMART？')) {
       setConnectionStatus('disconnected');
+      setScreen('disconnected');
     }
   };
 
@@ -89,6 +103,10 @@ export default function App() {
 
   if (screen === 'splash') {
     return <SplashScreen onFinish={handleSplashFinish} />;
+  }
+
+  if (screen === 'disconnected') {
+    return <DisconnectedScreen />;
   }
 
   return (
