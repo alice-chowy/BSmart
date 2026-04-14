@@ -48,7 +48,7 @@ export function ChatInput({
               key={s}
               type="button"
               onClick={() => handleSubmit(s)}
-              className="rounded-full border border-[#999999] bg-white px-3 py-1 text-[10px] text-[#444] hover:bg-[#E9EEF6] transition-colors"
+              className="rounded-full border border-[#999999] bg-white px-2.5 py-1 text-[14px] text-[#444] hover:bg-[#E9EEF6] transition-colors"
             >
               {s}
             </button>
@@ -89,7 +89,7 @@ export function ChatInput({
           onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
           placeholder={currentPlaceholder}
           disabled={inputDisabled}
-          className="flex-1 bg-transparent text-xs outline-none disabled:cursor-not-allowed"
+          className="flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
         />
 
         <div className="relative group">

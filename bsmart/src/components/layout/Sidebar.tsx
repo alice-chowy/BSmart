@@ -176,7 +176,7 @@ export function Sidebar({
       </div>
 
       {expanded && (
-        <div className="flex-1 mt-3 overflow-y-auto space-y-0.5">
+        <div className="flex-1 mt-3 overflow-y-auto space-y-1.75">
           {chats.map((chat) => (
             <ChatItem
               key={chat.id}
