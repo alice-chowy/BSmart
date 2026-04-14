@@ -1,20 +1,16 @@
+import logoIcon from '@logo/LOGO_icon.png'
+
 interface LogoPlaceholderProps {
   size?: number
-  label?: string
 }
 
-export function LogoPlaceholder({ size = 48, label = "Logo" }: LogoPlaceholderProps) {
+export function LogoPlaceholder({ size = 48 }: LogoPlaceholderProps) {
   return (
-    <div
-      className="rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0"
-      style={{
-        width: size,
-        height: size,
-        background: "linear-gradient(135deg, #c850c0 0%, #4158d0 100%)",
-        fontSize: size * 0.3,
-      }}
-    >
-      {label[0] ?? "B"}
-    </div>
+    <img
+      src={logoIcon}
+      alt="Logo"
+      className="rounded-lg flex-shrink-0 object-contain"
+      style={{ width: size, height: size }}
+    />
   )
 }

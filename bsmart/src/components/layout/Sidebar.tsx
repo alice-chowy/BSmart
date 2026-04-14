@@ -43,18 +43,18 @@ function ChatItem({ chat, isActive, onSelectChat, onRenameChat, onDeleteChat }: 
       <button
         type="button"
         onClick={() => onSelectChat(chat.id)}
-        className={`w-full rounded-xl px-3 py-2 text-left text-xm flex items-center gap-1 ${
+        className={`w-full rounded-lg px-2 py-0.5 text-left flex items-center gap-1 ${
           isActive ? "bg-[#E9EEF6]" : "bg-transparent hover:bg-[#E9EEF6]"
         }`}
       >
-        <span className="flex-1 truncate">{chat.title}</span>
+        <span className="flex-1 truncate text-[14px]">{chat.title}</span>
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation()
             setMenuOpen((v) => !v)
           }}
-          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#555] hover:bg-[#D4DEF0] flex-shrink-0 leading-none"
+          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#555] hover:bg-[#D4DEF0] flex-shrink-0 leading-none text-[12px]"
         >
           ⋯
         </button>
@@ -176,7 +176,7 @@ export function Sidebar({
       </div>
 
       {expanded && (
-        <div className="flex-1 mt-3 overflow-y-auto space-y-2">
+        <div className="flex-1 mt-3 overflow-y-auto space-y-0.5">
           {chats.map((chat) => (
             <ChatItem
               key={chat.id}

@@ -44,7 +44,6 @@ export function ChatView({
       <div className="px-6 pb-6">
         <ChatInput
           onSend={onSend}
-          placeholder="掃描"
           disabled={isLoading}
           showModeIcon
           selectedMode={selectedMode}

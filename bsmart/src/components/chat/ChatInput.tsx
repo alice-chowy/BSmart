@@ -1,6 +1,5 @@
 import { useRef, useState } from "react"
 import { ModeMenu } from "../mode/ModeMenu"
-import { IconPlaceholder } from "../common/IconPlaceholder"
 import { useClickOutside } from "../../hooks/useClickOutside"
 import type { Mode } from "../../types"
 
@@ -16,7 +15,7 @@ interface ChatInputProps {
 
 export function ChatInput({
   onSend,
-  placeholder = "掃描",
+  placeholder = "先點選左側圖標選擇模式",
   disabled = false,
   showModeIcon = false,
   selectedMode,
@@ -49,7 +48,7 @@ export function ChatInput({
               key={s}
               type="button"
               onClick={() => handleSubmit(s)}
-              className="rounded-full border border-[#999999] bg-white px-3 py-1 text-xs text-[#444] hover:bg-[#E9EEF6] transition-colors"
+              className="rounded-full border border-[#999999] bg-white px-3 py-1 text-[10px] text-[#444] hover:bg-[#E9EEF6] transition-colors"
             >
               {s}
             </button>
@@ -66,9 +65,14 @@ export function ChatInput({
               type="button"
               onClick={() => setModeMenuOpen((current) => !current)}
               title="選擇功能模式"
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-[#2d2d6b] text-white"
+              className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[#E9EEF6] bg-transparent"
             >
-              <IconPlaceholder size={16} label="mode" />
+              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                <rect x="0" y="0" width="8" height="8" rx={selectedMode ? 3 : 1} fill="#1a1a4e" />
+                <rect x="10" y="0" width="8" height="8" rx={selectedMode ? 3 : 1} fill="#1a1a4e" />
+                <rect x="0" y="10" width="8" height="8" rx={selectedMode ? 3 : 1} fill="#1a1a4e" />
+                <rect x="10" y="10" width="8" height="8" rx={selectedMode ? 3 : 1} fill="#1a1a4e" />
+              </svg>
             </button>
             {modeMenuOpen && (
               <ModeMenu selectedMode={selectedMode} onSelect={(mode) => {
@@ -85,7 +89,7 @@ export function ChatInput({
           onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
           placeholder={currentPlaceholder}
           disabled={inputDisabled}
-          className="flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
+          className="flex-1 bg-transparent text-xs outline-none disabled:cursor-not-allowed"
         />
 
         <div className="relative group">
@@ -106,10 +110,6 @@ export function ChatInput({
           )}
         </div>
       </div>
-
-      {showModeIcon && !selectedMode && (
-        <div className="mt-2 text-center text-[11px] text-[#888]">請先點選左側圖標選擇模式</div>
-      )}
     </div>
   )
 }

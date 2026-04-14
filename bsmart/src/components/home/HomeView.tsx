@@ -22,7 +22,6 @@ export function HomeView({ onSend, selectedMode, onSelectMode, suggestions = [] 
         <div className="mt-10">
           <ChatInput
             onSend={onSend}
-            placeholder="掃描"
             showModeIcon
             selectedMode={selectedMode}
             onSelectMode={onSelectMode}

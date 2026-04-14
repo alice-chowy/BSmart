@@ -8,7 +8,7 @@ interface ModeMenuProps {
 
 export function ModeMenu({ selectedMode, onSelect }: ModeMenuProps) {
   return (
-    <div className="absolute bottom-full left-0 mb-2 min-w-[120px] rounded-2xl border border-[#999999] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-30">
+    <div className="absolute left-0 bottom-full mb-1 min-w-[120px] rounded-xl border border-[#999999] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-50 overflow-hidden">
       {MODE_OPTIONS.map((opt) => (
         <button
           type="button"
