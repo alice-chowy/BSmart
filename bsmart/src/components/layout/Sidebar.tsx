@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { PanelLeftClose, PanelLeftOpen, SquarePen, HardDrive, Wifi } from "lucide-react"
+import { PanelLeftClose, PanelLeftOpen, SquarePen, HardDrive } from "lucide-react"
 import type { Chat } from "../../types"
 import { useClickOutside } from "../../hooks/useClickOutside"
 
@@ -112,6 +112,7 @@ interface SidebarProps {
   onOpenSettings: () => void
   deviceName?: string
   connectionStatus?: ConnectionStatus
+  onConnectionClick?: () => void
   onRenameChat?: (id: string, title: string) => void
   onDeleteChat?: (id: string) => void
 }
@@ -134,6 +135,7 @@ export function Sidebar({
   onOpenSettings,
   deviceName,
   connectionStatus = "connected",
+  onConnectionClick,
   onRenameChat,
   onDeleteChat,
 }: SidebarProps) {
@@ -203,8 +205,30 @@ export function Sidebar({
           <SidebarTooltip text="設定" />
         </div>
 
-        <div className={`relative group mt-2 flex items-center ${expanded ? "gap-2 pl-1.5" : "justify-center"}`}>
-          <Wifi size={22} color={conn.color} />
+        <div
+          className={`relative group mt-2 flex items-center ${expanded ? "gap-2 pl-1.5" : "justify-center"} ${connectionStatus === "connected" ? "cursor-pointer" : "cursor-default"}`}
+          onClick={onConnectionClick}
+          role={connectionStatus === "connected" ? "button" : undefined}
+          aria-label={connectionStatus === "connected" ? "離開 BSMART" : undefined}
+        >
+          {/* 插頭連線狀態 icon：灰=離線 橘=執行中 綠=連線中 */}
+          <svg width="22" height="22" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round">
+            {/* 左插頭：兩根插腳 */}
+            <line x1="10" y1="4" x2="10" y2="14" stroke={conn.color} strokeWidth="5"/>
+            <line x1="20" y1="4" x2="20" y2="14" stroke={conn.color} strokeWidth="5"/>
+            {/* 左插頭本體 */}
+            <rect x="6" y="14" width="18" height="10" rx="4" fill={conn.color}/>
+            {/* 左插頭出線 */}
+            <line x1="15" y1="24" x2="15" y2="32" stroke={conn.color} strokeWidth="5"/>
+            {/* U 型連接弧線 */}
+            <path d="M15 32 Q15 50 40 50 Q65 50 65 32" stroke={conn.color} strokeWidth="5" fill="none"/>
+            {/* 右插頭出線 */}
+            <line x1="65" y1="24" x2="65" y2="32" stroke={conn.color} strokeWidth="5"/>
+            {/* 右插頭本體 */}
+            <rect x="56" y="14" width="18" height="10" rx="4" fill={conn.color}/>
+            {/* 右插頭接孔（方框） */}
+            <rect x="59" y="4" width="12" height="12" rx="3" stroke={conn.color} strokeWidth="4" fill="none"/>
+          </svg>
           {expanded ? (
             <>
               <span className="text-[12px]" style={{ color: conn.color }}>{conn.label}</span>
