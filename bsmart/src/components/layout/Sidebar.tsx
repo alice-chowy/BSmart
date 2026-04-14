@@ -43,7 +43,7 @@ function ChatItem({ chat, isActive, onSelectChat, onRenameChat, onDeleteChat }: 
       <button
         type="button"
         onClick={() => onSelectChat(chat.id)}
-        className={`w-full rounded-xl px-3 py-2 text-left text-sm flex items-center gap-1 ${
+        className={`w-full rounded-xl px-3 py-2 text-left text-xm flex items-center gap-1 ${
           isActive ? "bg-[#E9EEF6]" : "bg-transparent hover:bg-[#E9EEF6]"
         }`}
       >
