@@ -20,3 +20,9 @@ export interface Chat {
   title: string
   messages: Message[]
 }
+
+export interface QuickAction {
+  id: string
+  label: string
+  icon: string
+}

@@ -1,16 +1,17 @@
 import logoIcon from "@logo/LOGO_icon.png"
 import { ChatInput } from "../chat/ChatInput"
 import { DeviceBridge } from "./DeviceBridge"
-import type { Mode } from "../../types"
+import type { Mode, QuickAction } from "../../types"
 
 interface HomeViewProps {
   onSend: (text: string) => void
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
   suggestions?: string[]
+  quickActions?: QuickAction[]
 }
 
-export function HomeView({ onSend, selectedMode, onSelectMode, suggestions = [] }: HomeViewProps) {
+export function HomeView({ onSend, selectedMode, onSelectMode, suggestions = [], quickActions = [] }: HomeViewProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8 py-10">
       <div className="w-full max-w-[560px]">
@@ -26,6 +27,7 @@ export function HomeView({ onSend, selectedMode, onSelectMode, suggestions = [] 
             selectedMode={selectedMode}
             onSelectMode={onSelectMode}
             suggestions={suggestions}
+            quickActions={quickActions}
           />
         </div>
       </div>

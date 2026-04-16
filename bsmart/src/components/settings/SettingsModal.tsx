@@ -1,6 +1,13 @@
 import { useState } from "react"
 import type { Model } from "../../types"
 
+interface HardwareInfo {
+  source: string
+  name: string
+  total_mb: number
+  free_mb: number
+}
+
 interface SettingsModalProps {
   open: boolean
   onClose: () => void
@@ -9,6 +16,7 @@ interface SettingsModalProps {
   onAddCustom: (name: string) => void
   onClearAllChats?: () => void
   onShutdown?: () => void
+  hardware?: HardwareInfo | null
 }
 
 export function SettingsModal({
@@ -19,6 +27,7 @@ export function SettingsModal({
   onAddCustom,
   onClearAllChats,
   onShutdown,
+  hardware,
 }: SettingsModalProps) {
   const [tab, setTab] = useState<"general" | "models">("models")
 
@@ -75,6 +84,29 @@ export function SettingsModal({
                   清除全部對話
                 </button>
               </div>
+
+              <div className="border-t border-[#999999] my-4" />
+
+              {/* 硬體資訊 */}
+              {hardware && (
+                <div className="mb-5">
+                  <div className="mb-1 text-sm font-semibold text-[#333]">硬體資訊</div>
+                  <div className="rounded-2xl bg-[#F5F5F5] px-4 py-3 text-xs text-[#555] space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-[#888]">運算裝置</span>
+                      <span className="font-medium">{hardware.source.toUpperCase()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#888]">名稱</span>
+                      <span className="font-medium text-right max-w-[60%]">{hardware.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#888]">記憶體</span>
+                      <span className="font-medium">{hardware.free_mb.toLocaleString()} / {hardware.total_mb.toLocaleString()} MB 可用</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="border-t border-[#999999] my-4" />
 

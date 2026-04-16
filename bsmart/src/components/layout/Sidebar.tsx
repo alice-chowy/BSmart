@@ -94,12 +94,13 @@ function ChatItem({ chat, isActive, onSelectChat, onRenameChat, onDeleteChat }: 
   )
 }
 
-type ConnectionStatus = "connected" | "running" | "disconnected"
+type ConnectionStatus = "connected" | "loading" | "disconnected" | "running"
 
-const CONNECTION_CONFIG: Record<ConnectionStatus, { color: string; label: string }> = {
-  connected: { color: "#5a9a3c", label: "連線中" },
+const CONNECTION_CONFIG: Record<ConnectionStatus, { color: string; label: string; pulse?: boolean }> = {
+  connected: { color: "#5a9a3c", label: "已連線" },
+  loading: { color: "#e07b00", label: "連線中", pulse: true },
+  disconnected: { color: "#cc0000", label: "已斷線" },
   running: { color: "#e07b00", label: "執行中" },
-  disconnected: { color: "#999999", label: "已斷線" },
 }
 
 interface SidebarProps {
@@ -134,7 +135,7 @@ export function Sidebar({
   onNewChat,
   onOpenSettings,
   deviceName,
-  connectionStatus = "connected",
+  connectionStatus = "loading",
   onConnectionClick,
   onRenameChat,
   onDeleteChat,
@@ -212,7 +213,7 @@ export function Sidebar({
           aria-label={connectionStatus === "connected" ? "離開 BSMART" : undefined}
         >
           {/* 插頭連線狀態 icon：灰=離線 橘=執行中 綠=連線中 */}
-          <svg width="22" height="22" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round" className={conn.pulse ? "animate-pulse" : undefined}>
             {/* 左插頭：兩根插腳 */}
             <line x1="10" y1="4" x2="10" y2="14" stroke={conn.color} strokeWidth="5"/>
             <line x1="20" y1="4" x2="20" y2="14" stroke={conn.color} strokeWidth="5"/>

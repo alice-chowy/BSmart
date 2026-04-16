@@ -21,8 +21,11 @@ const MODE_LABEL: Record<string, string> = {
   scan: "掃描",
   search: "搜尋",
   manage: "管理",
-  sync: "同步",                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+  sync: "同步",
 }
+
+/** loading 動畫最少顯示毫秒數 */
+const MIN_LOADING_MS = 3000
 
 export function useChat(modelId?: string) {
   const [chats, setChats] = useState<Chat[]>([])
@@ -93,15 +96,48 @@ export function useChat(modelId?: string) {
       setActiveChatId(currentChatId)
       setIsLoading(true)
 
-      // 先插入一個空的 assistant 訊息（用於 streaming 累加）
-      const assistantPlaceholder = { role: "assistant" as const, content: "" }
+      // 插入空的 assistant placeholder（content 為空時 ChatView 會顯示 loading 動畫）
       setChats((prev) =>
         prev.map((c) =>
           c.id === currentChatId
-            ? { ...c, messages: [...c.messages, assistantPlaceholder] }
+            ? { ...c, messages: [...c.messages, { role: "assistant" as const, content: "" }] }
             : c,
         ),
       )
+
+      // ── 延遲控制 ─────────────────────────────────────────
+      const startTime = Date.now()
+      let tokenBuffer = ""       // 3 秒內先 buffer
+      let readyToFlush = false   // 3 秒後設 true
+      let streamDone = false     // WS 傳完設 true
+
+      // 把 buffer 寫入 state
+      const flushBuffer = () => {
+        if (!tokenBuffer) return
+        const buf = tokenBuffer
+        tokenBuffer = ""
+        setChats((prev) =>
+          prev.map((c) => {
+            if (c.id !== currentChatId) return c
+            const msgs = [...c.messages]
+            const last = msgs[msgs.length - 1]
+            if (last?.role === "assistant") {
+              msgs[msgs.length - 1] = { ...last, content: last.content + buf }
+            }
+            return { ...c, messages: msgs }
+          }),
+        )
+      }
+
+      // 3 秒計時器
+      const delayTimer = window.setTimeout(() => {
+        readyToFlush = true
+        flushBuffer()
+        // 如果 stream 在 3 秒內已經結束，現在才收尾
+        if (streamDone) {
+          setIsLoading(false)
+        }
+      }, MIN_LOADING_MS)
 
       // 決定 session_id（與 chat 綁定）
       if (!sessionMap.current.has(currentChatId)) {
@@ -110,7 +146,30 @@ export function useChat(modelId?: string) {
       }
       const sessionId = sessionMap.current.get(currentChatId)!
 
-      // 建立 WebSocket 連線
+      // ── 輔助：stream 結束後的收尾 ─────────────────────────
+      const finishStream = () => {
+        streamDone = true
+        if (readyToFlush) {
+          // 已過 3 秒，直接結束
+          flushBuffer()
+          setIsLoading(false)
+        }
+        // 還沒到 3 秒 → delayTimer 到期時會處理
+      }
+
+      // ── 輔助：fallback POST 回應處理 ──────────────────────
+      const handleFallbackResponse = (content: string) => {
+        tokenBuffer += content
+        if (readyToFlush) {
+          flushBuffer()
+          setIsLoading(false)
+        } else {
+          streamDone = true
+          // delayTimer 到期時會 flush + setIsLoading(false)
+        }
+      }
+
+      // ── 建立 WebSocket 連線 ────────────────────────────────
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
       const ws = new WebSocket(`${protocol}//${window.location.host}/ws/chat`)
       wsRef.current = ws
@@ -132,22 +191,29 @@ export function useChat(modelId?: string) {
             token: string
             done: boolean
           }
-          // 累加 token 到最後一則 assistant 訊息
-          setChats((prev) =>
-            prev.map((c) => {
-              if (c.id !== currentChatId) return c
-              const msgs = [...c.messages]
-              const last = msgs[msgs.length - 1]
-              if (last?.role === "assistant") {
-                msgs[msgs.length - 1] = { ...last, content: last.content + data.token }
-              }
-              return { ...c, messages: msgs }
-            }),
-          )
+
+          if (readyToFlush) {
+            // 已過 3 秒，token 直接寫入 state
+            setChats((prev) =>
+              prev.map((c) => {
+                if (c.id !== currentChatId) return c
+                const msgs = [...c.messages]
+                const last = msgs[msgs.length - 1]
+                if (last?.role === "assistant") {
+                  msgs[msgs.length - 1] = { ...last, content: last.content + data.token }
+                }
+                return { ...c, messages: msgs }
+              }),
+            )
+          } else {
+            // 還在 3 秒內，先存 buffer
+            tokenBuffer += data.token
+          }
+
           if (data.done) {
-            setIsLoading(false)
             ws.close()
             wsRef.current = null
+            finishStream()
           }
         } catch {
           // ignore malformed frames
@@ -170,32 +236,11 @@ export function useChat(modelId?: string) {
         })
           .then((res) => res.json())
           .then((data: { response: string }) => {
-            setChats((prev) =>
-              prev.map((c) => {
-                if (c.id !== currentChatId) return c
-                const msgs = [...c.messages]
-                const last = msgs[msgs.length - 1]
-                if (last?.role === "assistant") {
-                  msgs[msgs.length - 1] = { ...last, content: data.response }
-                }
-                return { ...c, messages: msgs }
-              }),
-            )
+            handleFallbackResponse(data.response)
           })
           .catch(() => {
-            setChats((prev) =>
-              prev.map((c) => {
-                if (c.id !== currentChatId) return c
-                const msgs = [...c.messages]
-                const last = msgs[msgs.length - 1]
-                if (last?.role === "assistant") {
-                  msgs[msgs.length - 1] = { ...last, content: "⚠️ 無法連線至後端，請確認伺服器已啟動。" }
-                }
-                return { ...c, messages: msgs }
-              }),
-            )
+            handleFallbackResponse("⚠️ 無法連線至後端，請確認伺服器已啟動。")
           })
-          .finally(() => setIsLoading(false))
       }
     },
     [activeChatId, isLoading, selectedMode, modelId],

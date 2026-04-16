@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import { ModeMenu } from "../mode/ModeMenu"
 import { useClickOutside } from "../../hooks/useClickOutside"
-import type { Mode } from "../../types"
+import type { Mode, QuickAction } from "../../types"
 
 interface ChatInputProps {
   onSend: (text: string) => void
@@ -11,6 +11,7 @@ interface ChatInputProps {
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
   suggestions?: string[]
+  quickActions?: QuickAction[]
 }
 
 export function ChatInput({
@@ -21,6 +22,7 @@ export function ChatInput({
   selectedMode,
   onSelectMode,
   suggestions = [],
+  quickActions = [],
 }: ChatInputProps) {
   const [text, setText] = useState("")
   const [modeMenuOpen, setModeMenuOpen] = useState(false)
@@ -40,6 +42,22 @@ export function ChatInput({
 
   return (
     <div className="relative w-full max-w-[560px] mx-auto">
+      {/* quick_actions 按鈕列 */}
+      {quickActions.length > 0 && selectedMode && (
+        <div className="flex flex-row gap-2 mb-2">
+          {quickActions.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              onClick={() => handleSubmit(action.label)}
+              className="rounded-lg border border-[#999999] bg-white px-2.5 py-1 text-[14px] text-[#444] hover:bg-[#E9EEF6] transition-colors flex items-center gap-1"
+            >
+              {action.icon} {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* 建議清單 chips */}
       {suggestions.length > 0 && selectedMode && (
         <div className="flex flex-wrap gap-2 mb-2">

@@ -6,11 +6,18 @@ import { ChatView } from './components/chat/ChatView';
 import { HomeView } from './components/home/HomeView';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { useChat } from './hooks/useChat';
-import { MODELS } from './constants/models';
-import type { Model, Mode } from './types';
+import { MODELS, TIER_TO_MODEL_ID } from './constants/models';
+import type { Model, Mode, QuickAction } from './types';
 import logoRmbg from '@logo/LOGO_rmbg.png';
 
-type ConnectionStatus = 'connected' | 'running' | 'disconnected';
+interface HardwareInfo {
+  source: string
+  name: string
+  total_mb: number
+  free_mb: number
+}
+
+type ConnectionStatus = 'connected' | 'loading' | 'disconnected';
 
 // 離開後的關閉畫面
 function DisconnectedScreen() {
@@ -31,12 +38,14 @@ export default function App() {
   const [model, setModel] = useState<Model>(MODELS[0]);
   const [customModels, setCustomModels] = useState<Model[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connected');
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('loading');
+  const [hardware, setHardware] = useState<HardwareInfo | null>(null);
   const chat = useChat(model.id);
 
   // 有對話在進行時顯示橘色「執行中」，否則依 connectionStatus
-  const displayConnectionStatus: ConnectionStatus =
-    chat.isLoading ? 'running' : connectionStatus;
+  const displayConnectionStatus =
+    chat.isLoading ? 'running' as const : connectionStatus;
 
   // 關閉/離開頁面時的提示
   useEffect(() => {
@@ -48,9 +57,38 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
+  useEffect(() => {
+    if (screen !== 'main') return;
+    const poll = () => {
+      fetch('/api/status')
+        .then((res) => res.json())
+        .then((data: { llama?: string; agent?: string }) => {
+          if (data.llama === 'running' && data.agent === 'ready') {
+            setConnectionStatus('connected');
+          } else if (data.llama === 'loading' || data.agent === 'initializing') {
+            setConnectionStatus('loading');
+          } else if (data.llama === 'stopped') {
+            setConnectionStatus('disconnected');
+          }
+        })
+        .catch(() => {
+          setConnectionStatus('disconnected');
+        });
+    };
+    poll();
+    const id = setInterval(poll, 10000);
+    return () => clearInterval(id);
+  }, [screen]);
+
   const handleAddCustomModel = (name: string) => {
     const newModel: Model = { id: name, name, desc: '自訂模型' };
     setCustomModels((prev) => [...prev, newModel]);
+  };
+
+  const handleNewChat = () => {
+    chat.newChat();
+    setSuggestions([]);
+    setQuickActions([]);
   };
 
   // 點擊插頭 icon（連線中）→ 詢問是否離開
@@ -66,14 +104,16 @@ export default function App() {
   const handleSelectMode = (mode: Mode) => {
     chat.setSelectedMode(mode);
     setSuggestions([]); // 先清空，等回傳
+    setQuickActions([]);
     fetch('/api/mode/select', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: mode.key }),
     })
       .then((res) => res.json())
-      .then((data: { suggestions?: string[] }) => {
+      .then((data: { suggestions?: string[]; quick_actions?: QuickAction[] }) => {
         setSuggestions(data.suggestions ?? []);
+        setQuickActions(data.quick_actions ?? []);
       })
       .catch(() => {});
   };
@@ -88,11 +128,17 @@ export default function App() {
     }).catch(() => {});
   };
 
-  // SplashScreen 完成後 → 確認後端 agent ready，再進主畫面
+  // SplashScreen 完成後 → 從 /api/status 取 tier & hardware，自動套用推薦模型
   const handleSplashFinish = () => {
     fetch('/api/status')
       .then((res) => res.json())
-      .then(() => {
+      .then((data: { tier?: string; hardware?: HardwareInfo }) => {
+        if (data.tier) {
+          const modelId = TIER_TO_MODEL_ID[data.tier];
+          const matched = modelId ? MODELS.find((m) => m.id === modelId) : undefined;
+          if (matched) setModel(matched);
+        }
+        if (data.hardware) setHardware(data.hardware);
         setScreen('main');
       })
       .catch(() => {
@@ -117,7 +163,7 @@ export default function App() {
         chats={chat.chats}
         activeChat={chat.activeChatId}
         onSelectChat={chat.selectChat}
-        onNewChat={chat.newChat}
+        onNewChat={handleNewChat}
         onOpenSettings={() => setSettingsOpen(true)}
         onRenameChat={chat.renameChat}
         onDeleteChat={chat.deleteChat}
@@ -136,6 +182,7 @@ export default function App() {
             selectedMode={chat.selectedMode}
             onSelectMode={handleSelectMode}
             suggestions={suggestions}
+            quickActions={quickActions}
           />
         ) : (
           <HomeView
@@ -143,6 +190,7 @@ export default function App() {
             selectedMode={chat.selectedMode}
             onSelectMode={handleSelectMode}
             suggestions={suggestions}
+            quickActions={quickActions}
           />
         )}
       </div>
@@ -155,6 +203,7 @@ export default function App() {
         onAddCustom={handleAddCustomModel}
         onClearAllChats={chat.clearAllChats}
         onShutdown={chat.shutdown}
+        hardware={hardware}
       />
     </div>
   );

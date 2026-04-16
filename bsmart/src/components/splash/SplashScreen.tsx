@@ -8,6 +8,8 @@ interface SplashScreenProps {
 export function SplashScreen({ onFinish }: SplashScreenProps) {
   const [progress, setProgress] = useState(0)
   const [message, setMessage] = useState("準備啟動中...")
+  const [tierLine1, setTierLine1] = useState("")
+  const [tierLine2, setTierLine2] = useState("")
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
@@ -24,16 +26,19 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
           const data = JSON.parse(event.data as string) as {
             value: number
             message: string
+            tier_line1?: string
+            tier_line2?: string
             done: boolean
             error: string | null
           }
           const pct = Math.round(data.value * 100)
           setProgress(pct)
           if (data.message) setMessage(data.message)
+          if (data.tier_line1) setTierLine1(data.tier_line1)
+          if (data.tier_line2) setTierLine2(data.tier_line2)
           if (data.done && !finished) {
             finished = true
             ws.close()
-            // 若後端已跑完才連上（pct 直接就是 100），給進度條 900ms 動畫跑完再離開
             window.setTimeout(onFinish, pct >= 100 ? 1000 : 300)
           }
         } catch {
@@ -41,7 +46,6 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         }
       }
 
-      // 後端尚未啟動或連線中斷，1 秒後重試
       ws.onerror = () => ws.close()
       ws.onclose = () => {
         if (!finished) {
@@ -66,9 +70,22 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         <img
           src={logoIcon}
           alt="BSMART Logo"
-          className="h-auto object-contain mb-[20px]"
+          className="h-auto object-contain"
           style={{ maxHeight: 200, maxWidth: 400 }}
         />
+
+        <div
+          className="text-[#6b6b9b] text-center max-w-[320px] transition-opacity duration-500"
+          style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: "11px", opacity: tierLine1 ? 1 : 0 }}
+        >
+          {tierLine1 || "\u00a0"}
+        </div>
+        <div
+          className="text-[#9b9bc0] text-center transition-opacity duration-500 mb-4"
+          style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: "11px", opacity: tierLine2 ? 1 : 0 }}
+        >
+          {tierLine2 || "\u00a0"}
+        </div>
 
         <div className="flex flex-col items-center gap-4">
           <div className={`w-[288px] h-1 rounded-full overflow-hidden relative${progress === 0 ? " animate-pulse" : ""}`}>

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import { ChatInput } from "./ChatInput"
 import { ChatMessage } from "./ChatMessage"
 import { DeviceBridge } from "../home/DeviceBridge"
-import type { Message, Mode } from "../../types"
+import type { Message, Mode, QuickAction } from '../../types'
 
 interface ChatViewProps {
   messages: Message[]
@@ -11,6 +11,7 @@ interface ChatViewProps {
   selectedMode: Mode | null
   onSelectMode: (mode: Mode) => void
   suggestions?: string[]
+  quickActions?: QuickAction[]
 }
 
 export function ChatView({
@@ -20,6 +21,7 @@ export function ChatView({
   selectedMode,
   onSelectMode,
   suggestions = [],
+  quickActions = [],
 }: ChatViewProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,9 +37,13 @@ export function ChatView({
 
       <div className="flex-1 overflow-y-auto px-8 py-5">
         {messages.map((message, index) => (
-          <ChatMessage key={index} role={message.role} content={message.content} />
+          <ChatMessage
+            key={index}
+            role={message.role}
+            content={message.content}
+            loading={message.role === "assistant" && !message.content && isLoading}
+          />
         ))}
-        {isLoading && <ChatMessage role="assistant" content="" loading />}
         <div ref={bottomRef} />
       </div>
 
@@ -49,6 +55,7 @@ export function ChatView({
           selectedMode={selectedMode}
           onSelectMode={onSelectMode}
           suggestions={suggestions}
+          quickActions={quickActions}
         />
       </div>
     </div>

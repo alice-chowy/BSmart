@@ -2,18 +2,31 @@ import type { Model } from "../types"
 
 export const MODELS: Model[] = [
   {
-    id: "llama-3.1-8B",
-    name: "Llama-3.1-8B",
-    desc: "適用 CPU 及 GPU 記憶體小10GB電腦",
+    id: "Gemma-4-Ultra",
+    name: "Gemma 4 26B",
+    desc: "Ultra — VRAM > 16 GB",
   },
   {
-    id: "Qwen2.5-14B-Instruct",
-    name: "Qwen2.5-14B-Instruct",
-    desc: "適用 GPU 記憶體約 12~16GB 電腦",
+    id: "Llama-3.1-8B-Advance",
+    name: "Llama 3.1 8B",
+    desc: "Advance — VRAM 8–16 GB",
   },
   {
-    id: "Mistral-Small-24B-Instruct",
-    name: "Mistral Small 24B Instruct",
-    desc: "適用 GPU 記憶體 16GB 以上電腦",
+    id: "Gemma-4-Standard",
+    name: "Gemma 4 4B",
+    desc: "Standard — VRAM ≤ 8 GB",
+  },
+  {
+    id: "Gemma-4-Lite",
+    name: "Gemma 4 2B",
+    desc: "Lite — CPU only",
   },
 ]
+
+/** 後端 tier 字串 → MODELS 中對應的 id */
+export const TIER_TO_MODEL_ID: Record<string, string> = {
+  Ultra:    "Gemma-4-Ultra",
+  Advance:  "Llama-3.1-8B-Advance",
+  Standard: "Gemma-4-Standard",
+  Lite:     "Gemma-4-Lite",
+}
