@@ -41,6 +41,7 @@ export function ChatView({
             key={index}
             role={message.role}
             content={message.content}
+            timestamp={message.timestamp}
             loading={message.role === "assistant" && !message.content && isLoading}
           />
         ))}

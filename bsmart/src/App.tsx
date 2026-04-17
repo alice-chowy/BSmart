@@ -41,7 +41,16 @@ export default function App() {
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('loading');
   const [hardware, setHardware] = useState<HardwareInfo | null>(null);
+  const [modeDescription, setModeDescription] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const chat = useChat(model.id);
+
+  // Toast 自動消失
+  useEffect(() => {
+    if (!toast) return;
+    const id = window.setTimeout(() => setToast(null), 2500);
+    return () => window.clearTimeout(id);
+  }, [toast]);
 
   // 有對話在進行時顯示橘色「執行中」，否則依 connectionStatus
   const displayConnectionStatus =
@@ -89,6 +98,7 @@ export default function App() {
     chat.newChat();
     setSuggestions([]);
     setQuickActions([]);
+    setModeDescription(null);
   };
 
   // 點擊插頭 icon（連線中）→ 詢問是否離開
@@ -105,15 +115,17 @@ export default function App() {
     chat.setSelectedMode(mode);
     setSuggestions([]); // 先清空，等回傳
     setQuickActions([]);
+    setModeDescription(null);
     fetch('/api/mode/select', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: mode.key }),
     })
       .then((res) => res.json())
-      .then((data: { suggestions?: string[]; quick_actions?: QuickAction[] }) => {
+      .then((data: { suggestions?: string[]; quick_actions?: QuickAction[]; name?: string; description?: string }) => {
         setSuggestions(data.suggestions ?? []);
         setQuickActions(data.quick_actions ?? []);
+        if (data.description) setModeDescription(data.description);
       })
       .catch(() => {});
   };
@@ -125,7 +137,12 @@ export default function App() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_id: m.id }),
-    }).catch(() => {});
+    })
+      .then((res) => res.json())
+      .then((data: { message?: string }) => {
+        setToast(data.message ?? `已切換至 ${m.name}`);
+      })
+      .catch(() => {});
   };
 
   // SplashScreen 完成後 → 從 /api/status 取 tier & hardware，自動套用推薦模型
@@ -191,6 +208,7 @@ export default function App() {
             onSelectMode={handleSelectMode}
             suggestions={suggestions}
             quickActions={quickActions}
+            modeDescription={modeDescription}
           />
         )}
       </div>
@@ -205,6 +223,13 @@ export default function App() {
         onShutdown={chat.shutdown}
         hardware={hardware}
       />
+
+      {/* 模型切換 Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] rounded-xl bg-[#333] px-5 py-2.5 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

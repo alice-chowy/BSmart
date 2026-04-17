@@ -15,8 +15,13 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8081',
       '/ws': {
-        target: 'ws://localhost:8081',
+        target: 'http://localhost:8081',
         ws: true,
+        // 靜默處理 proxy 斷線 log
+        on: {
+          error: () => {},
+          proxyReqWs: () => {},
+        },
       },
     },
     fs: {

@@ -19,6 +19,8 @@ interface SettingsModalProps {
   hardware?: HardwareInfo | null
 }
 
+type SettingsTab = "general" | "models" | "data" | "personal"
+
 export function SettingsModal({
   open,
   onClose,
@@ -29,14 +31,14 @@ export function SettingsModal({
   onShutdown,
   hardware,
 }: SettingsModalProps) {
-  const [tab, setTab] = useState<"general" | "models">("models")
+  const [tab, setTab] = useState<SettingsTab>("general")
 
   if (!open) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="relative flex w-[min(700px,90%)] max-h-[85vh] overflow-hidden rounded-[28px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
+        className="relative flex w-[min(700px,90%)] h-[min(600px,85vh)] overflow-hidden rounded-[28px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
         onClick={(event) => event.stopPropagation()}
       >
         <nav className="w-40 bg-[#D4E1F5] border-r border-[#999999] px-4 py-6 shrink-0">

@@ -15,12 +15,16 @@ export interface Mode {
 export interface Message {
   role: "user" | "assistant"
   content: string
+  timestamp?: string
 }
 
 export interface Chat {
   id: string
   title: string
   messages: Message[]
+  messageCount?: number
+  lastTimestamp?: string
+  model?: string
 }
 
 export interface QuickAction {

@@ -14,6 +14,7 @@ interface ApiSession {
 interface ApiMessage {
   role: "user" | "assistant"
   content: string
+  timestamp?: string
 }
 
 // 模式 key → 中文名稱
@@ -52,6 +53,9 @@ export function useChat(modelId?: string) {
             id: chatId,
             title: s.preview?.trim() || `${MODE_LABEL[s.mode] ?? s.mode} 對話`,
             messages: [], // 先空著，點選時才載入
+            messageCount: s.message_count,
+            lastTimestamp: s.last_timestamp,
+            model: s.model,
           }
         })
         setChats(historicChats)
@@ -235,7 +239,12 @@ export function useChat(modelId?: string) {
           }),
         })
           .then((res) => res.json())
-          .then((data: { response: string }) => {
+          .then((data: { response: string; session_id?: string }) => {
+            // 後端若回傳新的 session_id，更新 sessionMap 確保歷史追蹤正確
+            if (data.session_id) {
+              sessionMap.current.set(currentChatId, data.session_id)
+              sessionToChatId.current.set(data.session_id, currentChatId)
+            }
             handleFallbackResponse(data.response)
           })
           .catch(() => {
@@ -267,6 +276,7 @@ export function useChat(modelId?: string) {
           const messages: Message[] = data.messages.map((m) => ({
             role: m.role,
             content: m.content,
+            timestamp: m.timestamp,
           }))
           setChats((p) =>
             p.map((c) => (c.id === id ? { ...c, messages } : c)),

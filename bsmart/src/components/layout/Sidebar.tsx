@@ -47,7 +47,19 @@ function ChatItem({ chat, isActive, onSelectChat, onRenameChat, onDeleteChat }: 
           isActive ? "bg-[#E9EEF6]" : "bg-transparent hover:bg-[#E9EEF6]"
         }`}
       >
-        <span className="flex-1 truncate text-[14px]">{chat.title}</span>
+        <span className="flex-1 min-w-0">
+          <span className="block truncate text-[14px]">{chat.title}</span>
+          {(chat.messageCount !== undefined || chat.lastTimestamp) && (
+            <span className="block text-xs text-[#999] leading-tight">
+              {chat.messageCount !== undefined && `${chat.messageCount} 則訊息`}
+              {chat.messageCount !== undefined && chat.lastTimestamp && " · "}
+              {chat.lastTimestamp && new Date(chat.lastTimestamp).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" })}
+            </span>
+          )}
+          {chat.model && (
+            <span className="block text-xs text-[#bbb] leading-tight truncate">{chat.model}</span>
+          )}
+        </span>
         <button
           type="button"
           onClick={(e) => {

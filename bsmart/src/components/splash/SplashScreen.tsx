@@ -10,6 +10,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
   const [message, setMessage] = useState("準備啟動中...")
   const [tierLine1, setTierLine1] = useState("")
   const [tierLine2, setTierLine2] = useState("")
+  const [bootError, setBootError] = useState<string | null>(null)
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
@@ -33,6 +34,10 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
           }
           const pct = Math.round(data.value * 100)
           setProgress(pct)
+          if (data.error) {
+            setBootError(data.error)
+            return
+          }
           if (data.message) setMessage(data.message)
           if (data.tier_line1) setTierLine1(data.tier_line1)
           if (data.tier_line2) setTierLine2(data.tier_line2)
@@ -71,7 +76,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
           src={logoIcon}
           alt="BSMART Logo"
           className="h-auto object-contain"
-          style={{ maxHeight: 200, maxWidth: 400 }}
+          style={{ maxHeight: 200, maxWidth: 300 }}
         />
 
         <div
@@ -112,6 +117,15 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
           >
             {message}
           </div>
+
+          {bootError && (
+            <div
+              className="mt-2 max-w-[288px] rounded-lg bg-[#fdecea] border border-[#f5c6c2] px-4 py-2 text-center text-[#c0392b]"
+              style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: "12px" }}
+            >
+              ⚠️ {bootError}
+            </div>
+          )}
         </div>
       </div>
     </div>
