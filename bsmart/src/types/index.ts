@@ -8,6 +8,8 @@ export interface Mode {
   key: string
   number: number
   label: string
+  icon?: string
+  iconSize?: string
 }
 
 export interface Message {

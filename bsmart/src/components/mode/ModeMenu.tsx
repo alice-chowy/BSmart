@@ -18,9 +18,15 @@ export function ModeMenu({ selectedMode, onSelect }: ModeMenuProps) {
             selectedMode?.key === opt.key ? "bg-[#eef0f8]" : "hover:bg-[#f5f5f8]"
           }`}
         >
-          <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm border border-[#999999] text-[12px] font-semibold text-[#555]">
-            {opt.number}
-          </span>
+          {opt.icon ? (
+            <span className="inline-flex items-center justify-center w-5 h-5">
+              <img src={opt.icon} alt={opt.label} className={`${opt.iconSize ?? "w-5 h-5"} object-contain`} />
+            </span>
+          ) : (
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-sm border border-[#999999] text-[12px] font-semibold text-[#555]">
+              {opt.number}
+            </span>
+          )}
           <span>{opt.label}</span>
         </button>
       ))}
