@@ -27,36 +27,14 @@ export function ModelSelector({ selected, onSelect, onOpenSettings }: ModelSelec
       </button>
 
       {open && (
-      <div className="absolute top-full left-0 mt-2 w-[300px] overflow-hidden rounded-2xl border border-[#999999] bg-white text-sm shadow-[0_4px_16px_rgba(0,0,0,0.12)]"> 
-        {MODELS.map((model) => (
-            <button
-              key={model.id}
-              type="button"
-              onClick={() => {
-                onSelect(model)
-                setOpen(false)
-              }}
-              className={`w-full px-4 py-3 text-left ${
-                model.id === selected.id ? "bg-[#F5F5F5]" : "hover:bg-[#F5F5F5]"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold">{model.name}</span>
-                {model.id === selected.id && <span className="text-[#333]">✓</span>}
-              </div>
-              <div className="mt-1 text-xs text-[#888]">{model.desc}</div>
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false)
-              onOpenSettings()
-            }}
-            className="w-full px-4 py-3 text-left text-sm font-semibold text-[#333] border-t border-[#999999] hover:bg-[#F5F5F5]"
-          >
-            新增
-          </button>
+        <div className="absolute top-full left-0 mt-2 w-[300px] overflow-hidden rounded-2xl border border-[#999999] bg-white text-sm shadow-[0_4px_16px_rgba(0,0,0,0.12)]"> 
+          <div className="w-full px-4 py-3 text-left">
+            <div className="font-semibold text-[#333] mb-2">{selected.name}</div>
+            <div className="p-3 bg-[#F5F5F5] rounded-xl border border-[#E5E5E5]">
+              <div className="font-semibold text-[#333]">{selected.model_name || "目前模型"}</div>
+              <div className="mt-1 text-xs text-[#888]">{selected.desc}</div>
+            </div>
+          </div>
         </div>
       )}
     </div>
