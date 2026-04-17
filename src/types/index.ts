@@ -1,0 +1,23 @@
+export interface Model {
+  id: string
+  name: string
+  desc: string
+  model_name?: string
+}
+
+export interface Mode {
+  key: string
+  number: number
+  label: string
+}
+
+export interface Message {
+  role: "user" | "assistant"
+  content: string
+}
+
+export interface Chat {
+  id: string
+  title: string
+  messages: Message[]
+}
