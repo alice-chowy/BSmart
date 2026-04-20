@@ -13,22 +13,24 @@ BSMART App 是基於 **Vite + React 19 + TypeScript + Tailwind CSS v4** 的備�
 
 ## 已實作功能
 
-- **Splash 載入畫面**：應用程式啟動過渡動畫
-- **首頁（HomeView）**：歡迎頁面，含裝置橋接示意圖（SSD ↔ 電腦）
-- **頂部選單列（TopBar）**：模型下拉選單、設定按鈕
-- **左側欄（Sidebar）**：對話歷史清單、展開 / 收合、新增對話、裝置名稱顯示（SE880）
-- **功能模式選單（ModeMenu）**：掃描、匯入、還原、同步（可搭配訊息送出）
-- **對話頁面（ChatView）**：訊息顯示、輸入框、模擬非同步回覆（1.5 秒延遲）
-- **設定浮窗（SettingsModal）**：分頁式（一般 / 模型管理），支援新增自訂模型
-- **多對話管理（useChat）**：多對話切換、新增對話、訊息追加
+- **SplashScreen（開機畫面）**：WS `/ws/boot` 推送進度條與 tier 說明；`boot.error` 非 null 時顯示錯誤框
+- **HomeView（首頁）**：歡迎語、選模式後顯示 `modeDescription`、DeviceBridge 示意圖
+- **TopBar**：模型下拉選單（切換後顯示 toast）、設定按鈕
+- **Sidebar**：啟動時從 `GET /api/history` 載入歷史 session；顯示訊息數、最後時間、模型名稱；連線狀態指示燈；對話 CRUD
+- **ModeMenu**：4 個模式（掃描 / 搜尋 / 管理 / 同步），各有圖示與 icon size 控制；呼叫 `POST /api/mode/select` 取得 suggestions / quick_actions
+- **ChatView + ChatMessage**：WS `/ws/chat` streaming（3 秒最短動畫）；POST fallback；助手回覆以 `react-markdown` 渲染；歷史訊息顯示時間戳記
+- **ChatInput**：Enter 送出、模式圖示切換、quick action 快捷按鈕
+- **SettingsModal**：4 個分頁（一般 / 模型管理 / 資料 / 個人）
+- **useChat hook**：WS 生命週期管理、session 對應、history lazy-load、newChat / renameChat / deleteChat / clearAllChats / shutdown
 
-## 內建模型
+## 內建模型（`constants/models.ts`）
 
 | ID | 名稱 | 適用規格 |
 |----|------|---------|
-| `llama-3.1-8b` | Llama-3.1-8B | CPU 或 GPU 記憶體 < 10 GB |
-| `qwen-2.5-14b` | Qwen2.5-14B-Instruct | GPU 記憶體約 12–16 GB |
-| `mistral-24b` | Mistral Small 24B Instruct | GPU 記憶體 16 GB 以上 |
+| `gemma-4-standard` | Gemma 4 Standard | VRAM ≤ 8 GB |
+| `llama-3.1-8b` | Llama-3.1-8B | CPU 或 GPU < 10 GB |
+| `qwen-2.5-14b` | Qwen2.5-14B-Instruct | GPU 12–16 GB |
+| `mistral-24b` | Mistral Small 24B Instruct | GPU ≥ 16 GB |
 
 ## 開發
 
@@ -50,30 +52,27 @@ npm run build
 
 ```
 bsmart/
-├── public/             # 靜態資源（LOGO.jpg、LOGO_icon.png、LOGO_rmbg.png、icons.svg、favicon.svg）
 ├── src/
-│   ├── types/          # 共用 TypeScript 型別（Model、Mode、Message、Chat）
-│   ├── constants/      # 模型清單（models.ts）與模式清單（modes.ts）
-│   ├── hooks/          # useChat（對話狀態管理）、useClickOutside
+│   ├── types/          # 共用型別（Model、Mode、Message、Chat、QuickAction）
+│   ├── constants/      # models.ts（模型清單）、modes.ts（模式 + 圖示）
+│   ├── hooks/          # useChat（WS + 歷史管理）、useClickOutside
 │   └── components/
-│       ├── splash/     # SplashScreen
+│       ├── splash/     # SplashScreen（WS boot 進度）
 │       ├── layout/     # Sidebar、TopBar
 │       ├── home/       # HomeView、DeviceBridge
-│       ├── chat/       # ChatView、ChatMessage、ChatInput
+│       ├── chat/       # ChatView、ChatMessage（react-markdown）、ChatInput
 │       ├── mode/       # ModeMenu
 │       ├── model/      # ModelSelector
 │       ├── settings/   # SettingsModal
-│       └── common/     # IconPlaceholder、LogoPlaceholder
+│       └── common/     # LogoPlaceholder、IconPlaceholder
 ```
 
 ## Logo 資源
 
-logo 圖片位於 `public/` 資料夾，可直接以根路徑引用（例如 `/LOGO_icon.png`）：
+Logo 圖片位於專案外的 `../logo/` 目錄，透過 `@logo` vite alias 引用：
 
 | 檔案 | 說明 |
 |------|------|
 | `LOGO.jpg` | 完整 logo |
 | `LOGO_icon.png` | Icon 版 logo |
 | `LOGO_rmbg.png` | 去背版 logo |
-| `icons.svg` | UI 圖示集 |
-| `favicon.svg` | 瀏覽器分頁圖示 |
