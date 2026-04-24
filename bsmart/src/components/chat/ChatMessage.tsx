@@ -16,7 +16,7 @@ export function ChatMessage({ role, content, loading = false, timestamp }: ChatM
 
   return (
     <div className={`flex gap-3 mb-5 ${isUser ? "justify-end pr-40" : "justify-start pl-40"}`}>
-      {!isUser && <LogoPlaceholder size={32} />}
+      {!isUser && <LogoPlaceholder size={32} loading={loading} />}
       <div className="flex flex-col gap-0.5 max-w-[60%]">
         <div
           className={`rounded-[18px] px-4 py-3 text-sm leading-6 break-words overflow-hidden ${
