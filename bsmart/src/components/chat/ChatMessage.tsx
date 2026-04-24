@@ -24,7 +24,7 @@ export function ChatMessage({ role, content, loading = false, timestamp }: ChatM
           }`}
         >
           {loading ? (
-            <span className="text-[#888]"> <span className="bsmart-dot-anim">掃描中...</span> </span>
+            <span className="bsmart-typing"><span></span><span></span><span></span></span>
           ) : isUser ? (
             content
           ) : (
